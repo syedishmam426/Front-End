@@ -1,0 +1,11 @@
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/700.css";
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply font-sans bg-[#1A1A1A] text-gray-100 min-h-screen;
+}
