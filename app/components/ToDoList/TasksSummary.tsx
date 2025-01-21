@@ -10,7 +10,7 @@ export default function TasksSummary({ tasksCompleted, tasksCount }: { tasksComp
             <h2 className="flex items-center gap-2 text-[#8284FA]">
                 Completed 
                 <span className="bg-[#333333] text-[#D9D9D9] rounded-full px-3 py-1 text-sm">
-                    {tasksCompleted} de {tasksCount}
+                    {tasksCompleted} of {tasksCount}
                 </span>
             </h2>
         </div>

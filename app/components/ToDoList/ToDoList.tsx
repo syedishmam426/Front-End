@@ -77,9 +77,16 @@ export default function ToDoList({ tasks, tasksCompleted, tasksCount }: Tasks) {
     return (
         <div className="mt-6 relative">
             {/* Create Task Button */}
-            <button className="fixed left-1/2 -translate-x-1/2 bottom-[1085px] bg-toDoButtonBlue text-white py-2 px-4 rounded-md shadow-lg h-[52px] w-[736px]">
-                Create Task +
+            <button className="fixed left-1/2 -translate-x-1/2 bottom-[1085px] bg-toDoButtonBlue text-white py-2 px-4 rounded-md shadow-lg h-[52px] w-[736px] flex items-center justify-center gap-x-2">
+                Create Task
+                <Image
+                    src="/circled-plus.svg"
+                    alt="circled plus"
+                    width={16}
+                    height={16}
+                />
             </button>
+
 
             <div className="max-w-3xl mx-auto mt-[52px]">
                 {/* Summary Section */}
