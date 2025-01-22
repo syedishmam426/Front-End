@@ -10,3 +10,23 @@ export type Tasks = {
     tasksCompleted: number;
     tasksCount: number;
 }
+
+export type TaskProps = {
+    task: Task;
+    handleDelete: any;
+    handleComplete: any;
+}
+
+export type NewTask = {
+    title: string | undefined;
+    color: string | undefined
+}
+
+
+export type ButtonProps = {
+    text: string;
+    onClick: () => void;
+    iconSrc?: string;
+    iconAlt?: string;
+    iconSize?: number;
+}

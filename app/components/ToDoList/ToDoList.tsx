@@ -1,62 +1,56 @@
-"use client"
-import { useEffect, useState } from "react";
-import Image from "next/image";
+"use client";
+import { useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { Tasks } from "../../types/globals.d";
 import TasksSummary from "./TasksSummary";
 import Task from "./Task";
+import Button from "../Button/Button";
+import { sortCompletedTasksToBottom } from "../../utils/taskUtils";
 
 export default function ToDoList({ tasks, tasksCompleted, tasksCount }: Tasks) {
-
-    const [tasksData, setTasksData] = useState<Tasks>({ tasks: [], tasksCompleted: 0, tasksCount: 0 })
+    const router = useRouter();
+    const [tasksData, setTasksData] = useState<Tasks>({ tasks: [], tasksCompleted: 0, tasksCount: 0 });
 
     useEffect(() => {
-        setTasksData({ tasks, tasksCompleted, tasksCount });
-    }, [])
+        setTasksData({
+            tasks: sortCompletedTasksToBottom([...tasks]),
+            tasksCompleted,
+            tasksCount,
+        });
+    }, [tasks, tasksCompleted, tasksCount]);
 
-    const handleDelete = async (id: string) => {
-        // Capture deleted task before updating state
+    const handleDeleteTask = useCallback(async (id: string) => {
         const deletedTask = tasksData.tasks.find(task => task.id === id);
-        if (!deletedTask) return; // If task doesn't exist, exit early
+        if (!deletedTask) return;
 
-        // Optimistically update state
-        setTasksData(prevState => ({
-            ...prevState,
-            tasks: prevState.tasks.filter(task => task.id !== id),
-            tasksCount: prevState.tasksCount - 1,
-            tasksCompleted: deletedTask.completed ? prevState.tasksCompleted - 1 : prevState.tasksCompleted,
+        setTasksData(prev => ({
+            ...prev,
+            tasks: prev.tasks.filter(task => task.id !== id),
+            tasksCount: prev.tasksCount - 1,
+            tasksCompleted: deletedTask.completed ? prev.tasksCompleted - 1 : prev.tasksCompleted,
         }));
 
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tasks/${id}`, {
-                method: "DELETE",
-            });
-
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tasks/${id}`, { method: "DELETE" });
             if (!res.ok) throw new Error("Failed to delete task");
         } catch (error) {
             console.error(error);
             alert("Failed to delete task. Please try again.");
-            // Revert state if API request fails
-            setTasksData(prevState => ({
-                ...prevState,
-                tasks: [...prevState.tasks, deletedTask],
-                tasksCount: prevState.tasksCount + 1,
-                tasksCompleted: deletedTask.completed ? prevState.tasksCompleted + 1 : prevState.tasksCompleted,
+            setTasksData(prev => ({
+                ...prev,
+                tasks: [...prev.tasks, deletedTask],
+                tasksCount: prev.tasksCount + 1,
+                tasksCompleted: deletedTask.completed ? prev.tasksCompleted + 1 : prev.tasksCompleted,
             }));
         }
-    };
+    }, [tasksData.tasks]);
 
-    const handleComplete = async (id: string, completed: boolean) => {
-        setTasksData(prevState => {
-            const updatedTasks = prevState.tasks.map(task =>
-                task.id === id ? { ...task, completed: !completed } : task
-            );
-
-            // Sort: Move completed tasks to bottom
-            updatedTasks.sort((a, b) => Number(a.completed) - Number(b.completed));
-
+    const handleToggleCompleteTask = useCallback(async (id: string, completed: boolean) => {
+        setTasksData(prev => {
+            const updatedTasks = prev.tasks.map(task => task.id === id ? { ...task, completed: !completed } : task);
             return {
-                ...prevState,
-                tasks: updatedTasks,
+                ...prev,
+                tasks: sortCompletedTasksToBottom(updatedTasks),
                 tasksCompleted: updatedTasks.filter(task => task.completed).length,
             };
         });
@@ -70,37 +64,18 @@ export default function ToDoList({ tasks, tasksCompleted, tasksCount }: Tasks) {
         } catch (error) {
             console.error("Failed to update task status", error);
         }
-    };
-
-
+    }, []);
 
     return (
         <div className="mt-6 relative">
-            {/* Create Task Button */}
-            <button className="fixed left-1/2 -translate-x-1/2 bottom-[1085px] bg-toDoButtonBlue text-white py-2 px-4 rounded-md shadow-lg h-[52px] w-[736px] flex items-center justify-center gap-x-2">
-                Create Task
-                <Image
-                    src="/circled-plus.svg"
-                    alt="circled plus"
-                    width={16}
-                    height={16}
-                />
-            </button>
-
-
+            <span className="fixed left-1/2 -translate-x-1/2 bottom-[1085px]">
+                <Button text="Create Task" onClick={() => router.push("/create-task")} iconSrc="/circled-plus.svg" iconAlt="Add Task" />
+            </span>
             <div className="max-w-3xl mx-auto mt-[52px]">
-                {/* Summary Section */}
                 <TasksSummary tasksCompleted={tasksData.tasksCompleted} tasksCount={tasksData.tasksCount} />
-
-                {/* Task List */}
                 <ul className="mt-4 space-y-3">
-                    {tasksData.tasks.map((task) => (
-                        <Task
-                            key={task.id}
-                            task={task}
-                            handleDelete={handleDelete}
-                            handleComplete={handleComplete}
-                        />
+                    {tasksData.tasks.map(task => (
+                        <Task key={task.id} task={task} handleDelete={handleDeleteTask} handleComplete={handleToggleCompleteTask} />
                     ))}
                 </ul>
             </div>
