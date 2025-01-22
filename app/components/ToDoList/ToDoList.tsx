@@ -11,6 +11,7 @@ import NoTasksInfo from "./NoTasksInfo";
 export default function ToDoList({ tasks, tasksCompleted, tasksCount }: Tasks) {
     const router = useRouter();
     const [tasksData, setTasksData] = useState<Tasks>({ tasks: [], tasksCompleted: 0, tasksCount: 0 });
+    const [toastMessage, setToastMessage] = useState<string | null>(null);
 
     useEffect(() => {
         setTasksData({
@@ -20,7 +21,11 @@ export default function ToDoList({ tasks, tasksCompleted, tasksCount }: Tasks) {
         });
     }, [tasks, tasksCompleted, tasksCount]);
 
-    //Delete task in UI optimistically and then delete on backend. If backend request fails, bring deleted task back
+    const showToast = (message: string) => {
+        setToastMessage(message);
+        setTimeout(() => setToastMessage(null), 2000);
+    };
+
     const handleDeleteTask = useCallback(async (id: string) => {
         const deletedTask = tasksData.tasks.find(task => task.id === id);
         if (!deletedTask) return;
@@ -35,10 +40,10 @@ export default function ToDoList({ tasks, tasksCompleted, tasksCount }: Tasks) {
         try {
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tasks/${id}`, { method: "DELETE" });
             if (!res.ok) throw new Error("Failed to delete task");
-            alert("Task deleted.");
+            showToast("Task deleted successfully.");
         } catch (error) {
             console.error(error);
-            alert("Failed to delete task. Please try again.");
+            showToast("Failed to delete task. Please try again.");
             setTasksData(prev => ({
                 ...prev,
                 tasks: [...prev.tasks, deletedTask],
@@ -79,9 +84,11 @@ export default function ToDoList({ tasks, tasksCompleted, tasksCount }: Tasks) {
         }
     }, [tasksData.tasks]);
 
-
     return (
         <div className="mt-6 relative flex flex-col items-center w-full">
+            {toastMessage && (
+                <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-black text-white px-4 py-2 rounded shadow-md">{toastMessage}</div>
+            )}
             <div className="absolute -top-6 sm:-top-10 md:-top-14 lg:-top-16 flex justify-center w-full">
                 <Button
                     text="Create Task"
@@ -104,8 +111,5 @@ export default function ToDoList({ tasks, tasksCompleted, tasksCount }: Tasks) {
                 )}
             </div>
         </div>
-
-
-
     );
 }
