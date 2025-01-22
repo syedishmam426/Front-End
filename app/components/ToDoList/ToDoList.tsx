@@ -20,6 +20,7 @@ export default function ToDoList({ tasks, tasksCompleted, tasksCount }: Tasks) {
         });
     }, [tasks, tasksCompleted, tasksCount]);
 
+    //Delete task in UI optimistically and then delete on backend. If backend request fails, bring deleted task back
     const handleDeleteTask = useCallback(async (id: string) => {
         const deletedTask = tasksData.tasks.find(task => task.id === id);
         if (!deletedTask) return;
@@ -34,6 +35,7 @@ export default function ToDoList({ tasks, tasksCompleted, tasksCount }: Tasks) {
         try {
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tasks/${id}`, { method: "DELETE" });
             if (!res.ok) throw new Error("Failed to delete task");
+            alert("Task deleted.");
         } catch (error) {
             console.error(error);
             alert("Failed to delete task. Please try again.");
@@ -79,7 +81,7 @@ export default function ToDoList({ tasks, tasksCompleted, tasksCount }: Tasks) {
 
 
     return (
-        <div className="mt-6 relative flex flex-col items-center">
+        <div className="mt-6 relative flex flex-col items-center w-full">
             <div className="absolute -top-6 sm:-top-10 md:-top-14 lg:-top-16 flex justify-center w-full">
                 <Button
                     text="Create Task"
@@ -89,7 +91,7 @@ export default function ToDoList({ tasks, tasksCompleted, tasksCount }: Tasks) {
                 />
             </div>
 
-            <div className="max-w-3xl mx-auto mt-[52px]">
+            <div className="w-full max-w-3xl mx-auto mt-[52px]">
                 <TasksSummary tasksCompleted={tasksData.tasksCompleted} tasksCount={tasksData.tasksCount} />
                 {tasksData.tasks.length > 0 ? (
                     <ul className="mt-4 space-y-3">
@@ -102,6 +104,7 @@ export default function ToDoList({ tasks, tasksCompleted, tasksCount }: Tasks) {
                 )}
             </div>
         </div>
+
 
 
     );
