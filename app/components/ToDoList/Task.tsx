@@ -5,7 +5,6 @@ import { TaskProps } from "../../types/globals.d";
 export default function ToDoList({ task, handleDelete, handleComplete }: TaskProps) {
     return (
         <li key={task.id} className="flex items-center justify-between bg-[#262626] p-4 rounded-lg shadow-md w-full">
-            {/* Entire Task is Clickable (Excluding Buttons) */}
             <Link
                 href={`/edit-task?id=${task.id}&title=${encodeURIComponent(task.title)}&color=${encodeURIComponent(task.color)}`}
                 className="flex items-center justify-between w-full px-4 py-2 min-w-0"
@@ -22,8 +21,6 @@ export default function ToDoList({ task, handleDelete, handleComplete }: TaskPro
                             height={17}
                         />
                     </button>
-
-                    {/* Ensure Text Wraps */}
                     <span
                         className={`flex-1 min-w-0 break-words ${
                             task.completed ? "line-through text-gray-500" : "text-white"
@@ -34,7 +31,7 @@ export default function ToDoList({ task, handleDelete, handleComplete }: TaskPro
                 </div>
             </Link>
 
-            {/* Delete button (Outside the Link) */}
+            {/* Delete button */}
             <button onClick={() => handleDelete(task.id)} className="p-2">
                 <Image src="/trash.svg" alt="Delete" width={12.48} height={14} />
             </button>

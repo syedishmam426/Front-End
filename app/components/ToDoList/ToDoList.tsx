@@ -79,31 +79,29 @@ export default function ToDoList({ tasks, tasksCompleted, tasksCount }: Tasks) {
 
 
     return (
-<div className="mt-6 relative flex flex-col items-center">
-    {/* ✅ Button stays inside wrapper, ensuring it remains aligned */}
-    <div className="absolute -top-6 sm:-top-10 md:-top-14 lg:-top-16 flex justify-center w-full">
-        <Button 
-            text="Create Task" 
-            onClick={() => router.push("/create-task")} 
-            iconSrc="/circled-plus.svg" 
-            iconAlt="Add Task"
-            className="w-[90%] sm:w-[80%] md:w-[60%] lg:w-[50%] max-w-[736px] h-[52px]" 
-        />
-    </div>
+        <div className="mt-6 relative flex flex-col items-center">
+            <div className="absolute -top-6 sm:-top-10 md:-top-14 lg:-top-16 flex justify-center w-full">
+                <Button
+                    text="Create Task"
+                    onClick={() => router.push("/create-task")}
+                    iconSrc="/circled-plus.svg"
+                    iconAlt="Add Task"
+                />
+            </div>
 
-    <div className="max-w-3xl mx-auto mt-[52px]">
-        <TasksSummary tasksCompleted={tasksData.tasksCompleted} tasksCount={tasksData.tasksCount} />
-        {tasksData.tasks.length > 0 ? (
-            <ul className="mt-4 space-y-3">
-                {tasksData.tasks.map(task => (
-                    <Task key={task.id} task={task} handleDelete={handleDeleteTask} handleComplete={handleToggleCompleteTask} />
-                ))}
-            </ul>
-        ) : (
-            <NoTasksInfo />
-        )}
-    </div>
-</div>
+            <div className="max-w-3xl mx-auto mt-[52px]">
+                <TasksSummary tasksCompleted={tasksData.tasksCompleted} tasksCount={tasksData.tasksCount} />
+                {tasksData.tasks.length > 0 ? (
+                    <ul className="mt-4 space-y-3">
+                        {tasksData.tasks.map(task => (
+                            <Task key={task.id} task={task} handleDelete={handleDeleteTask} handleComplete={handleToggleCompleteTask} />
+                        ))}
+                    </ul>
+                ) : (
+                    <NoTasksInfo />
+                )}
+            </div>
+        </div>
 
 
     );
