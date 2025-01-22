@@ -25,7 +25,7 @@ export default function TaskForm({ mode, initialTask, onSubmit }: TaskFormProps)
     }, [task, onSubmit, router]);
 
     return (
-        <div>
+        <div className="px-4 sm:px-6 md:px-8">
             {/* Back Button */}
             <Image
                 onClick={() => router.push("/")}
@@ -43,19 +43,21 @@ export default function TaskForm({ mode, initialTask, onSubmit }: TaskFormProps)
                     type="text"
                     value={task.title}
                     onChange={(e) => setTask({ ...task, title: e.target.value })}
-                    className="bg-[#262626] py-2 px-4 rounded-md shadow-lg h-[52px] w-[736px] text-sm border border-[#333333]"
+                    className="bg-[#262626] py-2 px-4 rounded-md shadow-lg h-[52px] w-full max-w-[736px] text-sm border border-[#333333]"
                     placeholder="Ex. Brush your teeth"
+                    maxLength={150}
                 />
             </div>
 
             {/* Color Picker (Preselect Current Color) */}
             <div className="mt-8">
                 <h2 className="text-[#4EA8DE] mb-4 text-sm font-bold">Color</h2>
-                <div className="flex space-x-3">
+                <div className="flex flex-wrap gap-2 sm:gap-3">
                     {COLOR_OPTIONS.map((color) => (
                         <button
                             key={color}
-                            className={`w-[52px] h-[52px] rounded-full border-2 ${task.color === color ? "border-white" : "border-transparent"}`}
+                            className={`w-10 h-10 sm:w-[42px] sm:h-[42px] md:w-[52px] md:h-[52px] rounded-full border-2 
+                        ${task.color === color ? "border-white" : "border-transparent"}`}
                             style={{ backgroundColor: color }}
                             onClick={() => setTask({ ...task, color })}
                         />
@@ -64,9 +66,15 @@ export default function TaskForm({ mode, initialTask, onSubmit }: TaskFormProps)
             </div>
 
             {/* Submit Button */}
-            <div className="mt-16">
-                <Button text={mode === "edit" ? "Save" : "Add Task"} onClick={handleSubmit} iconSrc="/circled-plus.svg" iconAlt="Submit Task" />
+            <div className="mt-16 flex items-center justify-center">
+                <Button
+                    text={mode === "edit" ? "Save" : "Add Task"}
+                    onClick={handleSubmit}
+                    iconSrc="/circled-plus.svg"
+                    iconAlt="Submit Task"
+                />
             </div>
         </div>
+
     );
 }

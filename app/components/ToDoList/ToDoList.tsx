@@ -6,6 +6,7 @@ import TasksSummary from "./TasksSummary";
 import Task from "./Task";
 import Button from "../Button/Button";
 import { sortCompletedTasksToBottom } from "../../utils/taskUtils";
+import NoTasksInfo from "./NoTasksInfo";
 
 export default function ToDoList({ tasks, tasksCompleted, tasksCount }: Tasks) {
     const router = useRouter();
@@ -47,7 +48,10 @@ export default function ToDoList({ tasks, tasksCompleted, tasksCount }: Tasks) {
 
     const handleToggleCompleteTask = useCallback(async (id: string, completed: boolean) => {
         setTasksData(prev => {
-            const updatedTasks = prev.tasks.map(task => task.id === id ? { ...task, completed: !completed } : task);
+            const updatedTasks = prev.tasks.map(task =>
+                task.id === id ? { ...task, completed: !completed } : task
+            );
+
             return {
                 ...prev,
                 tasks: sortCompletedTasksToBottom(updatedTasks),
@@ -56,29 +60,51 @@ export default function ToDoList({ tasks, tasksCompleted, tasksCount }: Tasks) {
         });
 
         try {
+            const task = tasksData.tasks.find(task => task.id === id);
+            if (!task) return;
+
             await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tasks/${id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ completed: !completed }),
+                body: JSON.stringify({
+                    title: task.title,
+                    color: task.color,
+                    completed: !completed,
+                }),
             });
         } catch (error) {
             console.error("Failed to update task status", error);
         }
-    }, []);
+    }, [tasksData.tasks]);
+
 
     return (
-        <div className="mt-6 relative">
-            <span className="fixed left-1/2 -translate-x-1/2 bottom-[1085px]">
-                <Button text="Create Task" onClick={() => router.push("/create-task")} iconSrc="/circled-plus.svg" iconAlt="Add Task" />
-            </span>
-            <div className="max-w-3xl mx-auto mt-[52px]">
-                <TasksSummary tasksCompleted={tasksData.tasksCompleted} tasksCount={tasksData.tasksCount} />
-                <ul className="mt-4 space-y-3">
-                    {tasksData.tasks.map(task => (
-                        <Task key={task.id} task={task} handleDelete={handleDeleteTask} handleComplete={handleToggleCompleteTask} />
-                    ))}
-                </ul>
-            </div>
-        </div>
+<div className="mt-6 relative flex flex-col items-center">
+    {/* ✅ Button stays inside wrapper, ensuring it remains aligned */}
+    <div className="absolute -top-6 sm:-top-10 md:-top-14 lg:-top-16 flex justify-center w-full">
+        <Button 
+            text="Create Task" 
+            onClick={() => router.push("/create-task")} 
+            iconSrc="/circled-plus.svg" 
+            iconAlt="Add Task"
+            className="w-[90%] sm:w-[80%] md:w-[60%] lg:w-[50%] max-w-[736px] h-[52px]" 
+        />
+    </div>
+
+    <div className="max-w-3xl mx-auto mt-[52px]">
+        <TasksSummary tasksCompleted={tasksData.tasksCompleted} tasksCount={tasksData.tasksCount} />
+        {tasksData.tasks.length > 0 ? (
+            <ul className="mt-4 space-y-3">
+                {tasksData.tasks.map(task => (
+                    <Task key={task.id} task={task} handleDelete={handleDeleteTask} handleComplete={handleToggleCompleteTask} />
+                ))}
+            </ul>
+        ) : (
+            <NoTasksInfo />
+        )}
+    </div>
+</div>
+
+
     );
 }
